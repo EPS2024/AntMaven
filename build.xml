@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="UPS-Main" default="create-jar" basedir=".">
+	<!-- Project Properties -->
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="build" />
+	<property name="lib.dir" value="lib" />
+	<property name="dist.dir" value="dist" />
+	<property name="reports.dir" value="reports" />
+	<property name="project.version" value="1.0" />
+	<property name="jar.name" value="ups-main-${project.version}.jar" />
+	<property name="jfrog.repo.url" value="http://10.11.0.82:8081/artifactory/maven-local" />
+	<property name="ups.core.version" value="1.0" />
+	<property name="ups.core.jar" value="ups-core-${ups.core.version}.jar" />
+	<property name="mysql.connector.version" value="8.0.33" />
+	<property name="postgresql.driver.version" value="42.6.2" />
+	<property name="junit.version" value="5.9.3" />
+	<property name="log4j.version" value="2.20.0" />
+	<property name="jackson.version" value="2.15.2" />
+	<property name="slf4j.version" value="2.0.7" />
+	<property name="maven.central" value="https://repo1.maven.org/maven2" />
+	<target name="check-dependencies">
+		<mkdir dir="${lib.dir}" />
+		<available file="${lib.dir}/ups-core-1.0.jar" property="ups.core.available" />
+		<antcall target="download-ups-core" />
+		<available file="${lib.dir}/mysql-connector-j-${mysql.connector.version}.jar" property="mysql.connector.available" />
+		<antcall target="download-mysql-connector" />
+
+		<!-- PostgreSQL Driver -->
+		<available file="${lib.dir}/postgresql-${postgresql.driver.version}.jar" property="postgresql.driver.available" />
+		<antcall target="download-postgresql-driver" />
+
+		<!-- JUnit 5 -->
+		<available file="${lib.dir}/junit-jupiter-api-${junit.version}.jar" property="junit.available" />
+		<antcall target="download-junit" />
+
+		<!-- Log4j -->
+		<available file="${lib.dir}/log4j-core-${log4j.version}.jar" property="log4j.available" />
+		<antcall target="download-log4j" />
+
+		<!-- Jackson JSON -->
+		<available file="${lib.dir}/jackson-databind-${jackson.version}.jar" property="jackson.available" />
+		<antcall target="download-jackson" />
+
+		<!-- SLF4J -->
+		<available file="${lib.dir}/slf4j-api-${slf4j.version}.jar" property="slf4j.available" />
+		<antcall target="download-slf4j" />
+	</target>
+
+	<!-- Dependency Download Targets -->
+	<target name="download-mysql-connector" unless="mysql.connector.available">
+		<get src="${maven.central}/com/mysql/mysql-connector-j/${mysql.connector.version}/mysql-connector-j-${mysql.connector.version}.jar" dest="${lib.dir}/mysql-connector-j-${mysql.connector.version}.jar" ignoreerrors="true" />
+	</target>
+
+	<target name="download-ups-core" unless="ups.core.available">
+		<get src="http://10.11.0.82:8081/artifactory/maven-local/com/ups-core/1.0/ups-core-1.0.jar" dest="${lib.dir}/ups-core-1.0.jar" username="admin" password="password" ignoreerrors="true" />
+	</target>
+
+
+	<target name="download-postgresql-driver" unless="postgresql.driver.available">
+		<get src="${maven.central}/org/postgresql/postgresql/${postgresql.driver.version}/postgresql-${postgresql.driver.version}.jar" dest="${lib.dir}/postgresql-${postgresql.driver.version}.jar" ignoreerrors="true" />
+	</target>
+
+	<target name="download-junit" unless="junit.available">
+		<get src="${maven.central}/org/junit/jupiter/junit-jupiter-api/${junit.version}/junit-jupiter-api-${junit.version}.jar" dest="${lib.dir}/junit-jupiter-api-${junit.version}.jar" ignoreerrors="true" />
+	</target>
+
+	<target name="download-log4j" unless="log4j.available">
+		<get src="${maven.central}/org/apache/logging/log4j/log4j-core/${log4j.version}/log4j-core-${log4j.version}.jar" dest="${lib.dir}/log4j-core-${log4j.version}.jar" ignoreerrors="true" />
+	</target>
+
+	<target name="download-jackson" unless="jackson.available">
+		<get src="${maven.central}/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/jackson-databind-${jackson.version}.jar" dest="${lib.dir}/jackson-databind-${jackson.version}.jar" ignoreerrors="true" />
+	</target>
+
+	<target name="download-slf4j" unless="slf4j.available">
+		<get src="${maven.central}/org/slf4j/slf4j-api/${slf4j.version}/slf4j-api-${slf4j.version}.jar" dest="${lib.dir}/slf4j-api-${slf4j.version}.jar" ignoreerrors="true" />
+	</target>
+
+	<!-- Cleanup Target -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+		<delete dir="${reports.dir}" />
+	</target>
+
+	<!-- Initialization -->
+	<target name="init" depends="clean,check-dependencies">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${dist.dir}/libs" />
+		<mkdir dir="${reports.dir}" />
+	</target>
+
+	<!-- Compilation Target -->
+	<target name="compile" depends="init">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" failonerror="false">
+			<classpath>
+				<!-- Dynamic classpath from lib directory -->
+				<fileset dir="${lib.dir}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+			<compilerarg value="-Xlint:unchecked" />
+			<compilerarg value="-Xlint:deprecation" />
+		</javac>
+
+		<!-- Copy resources -->
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- Create JAR -->
+	<target name="create-jar" depends="compile">
+		<!-- Copy dependencies to libs folder -->
+		<copy todir="${dist.dir}/libs" flatten="true">
+			<fileset dir="${lib.dir}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+
+		<jar destfile="${dist.dir}/${jar.name}" basedir="${build.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="com.ups.MainApplication" />
+				<attribute name="Implementation-Version" value="${project.version}" />
+				<attribute name="Built-Date" value="${TODAY}" />
+
+				<!-- Create Class-Path for runtime dependency resolution -->
+				<attribute name="Class-Path" value="${toString:manifest.classpath}" />
+			</manifest>
+
+			<!-- Create path reference for dependencies -->
+			<path id="manifest.classpath">
+				<fileset dir="${dist.dir}/libs">
+					<include name="*.jar" />
+				</fileset>
+			</path>
+
+			<!-- Include dependency JARs inside the JAR -->
+			<zipgroupfileset dir="${lib.dir}" includes="*.jar" />
+
+			<!-- Exclude unnecessary files -->
+			<exclude name="**/*.java" />
+			<exclude name="**/*.form" />
+		</jar>
+	</target>
+	<!-- Testing Target -->
+	<target name="test" depends="compile">
+		<junit printsummary="yes" haltonfailure="no" fork="true">
+			<classpath>
+				<path location="${build.dir}" />
+				<fileset dir="${lib.dir}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+
+			<formatter type="xml" />
+
+			<batchtest todir="${reports.dir}">
+				<fileset dir="${src.dir}">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	<!-- Documentation Target -->
+	<target name="javadoc">
+		<javadoc destdir="${reports.dir}/docs" author="true" version="true" use="true" windowtitle="UPS Core API">
+
+			<fileset dir="${src.dir}" defaultexcludes="yes">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+	<!-- Main Build Target -->
+	<target name="build" depends="clean,compile,create-jar,test,javadoc">
+		<echo message="Build completed successfully!" />
+		<echo message="JAR created: ${dist.dir}/${jar.name}" />
+		<echo message="Dependencies copied to: ${dist.dir}/libs" />
+	</target>
+</project>
+
+
+
+
