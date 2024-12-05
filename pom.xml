@@ -1,13 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.ups</groupId>
     <artifactId>ups-main</artifactId>
     <version>1.0</version>
-    
+    <packaging>jar</packaging>
+
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <ups.core.version>1.0</ups.core.version>
@@ -19,43 +19,16 @@
         <slf4j.version>2.0.7</slf4j.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jfrog-repo</id>
-            <url>http://10.11.0.82:8081/artifactory/maven-local</url>
-        </repository>
-    </repositories>
-
     <dependencies>
-        <dependency>
-            <groupId>com</groupId>
-            <artifactId>ups-core</artifactId>
-            <version>${ups.core.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.driver.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -64,10 +37,19 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -80,24 +62,8 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <compilerArgs>
-                        <arg>-Xlint:unchecked</arg>
-                        <arg>-Xlint:deprecation</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -105,19 +71,53 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.ups.MainApplication</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
+                            <mainClass>com.ups.MainApplication</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <reportsDirectory>${project.basedir}/reports</reportsDirectory>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.1</version>
+                <configuration>
+                    <destDir>${project.basedir}/reports/docs</destDir>
+                    <author>true</author>
+                    <version>true</version>
+                    <use>true</use>
+                    <windowTitle>UPS Core API</windowTitle>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/libs</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
