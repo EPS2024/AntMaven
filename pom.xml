@@ -1,0 +1,559 @@
+```xml
+<groupId>com.example</groupId>
+<artifactId>UPS-Main</artifactId>
+<version>1.0-SNAPSHOT</version>
+<build>
+    <defaultGoal>package</defaultGoal>
+    <directory>${project.basedir}</directory>
+</build>
+```
+```xml
+<properties>
+    <src.dir>src</src.dir>
+    <build.dir>build</build.dir>
+    <lib.dir>lib</lib.dir>
+    <dist.dir>dist</dist.dir>
+    <reports.dir>reports</reports.dir>
+    <project.version>1.0</project.version>
+    <jar.name>ups-main-${project.version}.jar</jar.name>
+    <jfrog.repo.url>http://10.11.0.82:8081/artifactory/maven-local</jfrog.repo.url>
+    <ups.core.version>1.0</ups.core.version>
+    <ups.core.jar>ups-core-${ups.core.version}.jar</ups.core.jar>
+    <mysql.connector.version>8.0.33</mysql.connector.version>
+    <postgresql.driver.version>42.6.2</postgresql.driver.version>
+    <junit.version>5.9.3</junit.version>
+    <log4j.version>2.20.0</log4j.version>
+    <jackson.version>2.15.2</jackson.version>
+    <slf4j.version>2.0.7</slf4j.version>
+    <maven.central>https://repo1.maven.org/maven2</maven.central>
+</properties>
+```
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.example</groupId>
+        <artifactId>ups-core</artifactId>
+        <version>${ups.core.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.connector.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${postgresql.driver.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+    </dependency>
+</dependencies>
+
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>check-dependencies</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <mkdir dir="${lib.dir}" />
+                            <available file="${lib.dir}/ups-core-1.0.jar" property="ups.core.available" />
+                            <antcall target="download-ups-core" />
+                            <available file="${lib.dir}/mysql-connector-j-${mysql.connector.version}.jar" property="mysql.connector.available" />
+                            <antcall target="download-mysql-connector" />
+                            <available file="${lib.dir}/postgresql-${postgresql.driver.version}.jar" property="postgresql.driver.available" />
+                            <antcall target="download-postgresql-driver" />
+                            <available file="${lib.dir}/junit-jupiter-api-${junit.version}.jar" property="junit.available" />
+                            <antcall target="download-junit" />
+                            <available file="${lib.dir}/log4j-core-${log4j.version}.jar" property="log4j.available" />
+                            <antcall target="download-log4j" />
+                            <available file="${lib.dir}/jackson-databind-${jackson.version}.jar" property="jackson.available" />
+                            <antcall target="download-jackson" />
+                            <available file="${lib.dir}/slf4j-api-${slf4j.version}.jar" property="slf4j.available" />
+                            <antcall target="download-slf4j" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>download-mysql-connector</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <get src="${maven.central}/com/mysql/mysql-connector-j/${mysql.connector.version}/mysql-connector-j-${mysql.connector.version}.jar"
+                                 dest="${lib.dir}/mysql-connector-j-${mysql.connector.version}.jar"
+                                 ignoreErrors="true" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>download-ups-core</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <get src="${jfrog.repo.url}/com/ups-core/${ups.core.version}/ups-core-${ups.core.version}.jar"
+                                 dest="${lib.dir}/ups-core-${ups.core.version}.jar"
+                                 username="admin"
+                                 password="password"
+                                 ignoreErrors="true" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>download-postgresql-driver</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <get src="${maven.central}/org/postgresql/postgresql/${postgresql.driver.version}/postgresql-${postgresql.driver.version}.jar"
+                                 dest="${lib.dir}/postgresql-${postgresql.driver.version}.jar"
+                                 ignoreErrors="true" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>download-junit</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <get src="${maven.central}/org/junit/jupiter/junit-jupiter-api/${junit.version}/junit-jupiter-api-${junit.version}.jar"
+                                 dest="${lib.dir}/junit-jupiter-api-${junit.version}.jar"
+                                 ignoreErrors="true" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>download-log4j</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <get src="${maven.central}/org/apache/logging/log4j/log4j-core/${log4j.version}/log4j-core-${log4j.version}.jar"
+                                 dest="${lib.dir}/log4j-core-${log4j.version}.jar"
+                                 ignoreErrors="true" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>download-jackson</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <get src="${maven.central}/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/jackson-databind-${jackson.version}.jar"
+                                 dest="${lib.dir}/jackson-databind-${jackson.version}.jar"
+                                 ignoreErrors="true" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>download-slf4j</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <get src="${maven.central}/org/slf4j/slf4j-api/${slf4j.version}/slf4j-api-${slf4j.version}.jar"
+                                 dest="${lib.dir}/slf4j-api-${slf4j.version}.jar"
+                                 ignoreErrors="true" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+                <execution>
+                    <id>auto-clean</id>
+                    <phase>clean</phase>
+                    <goals>
+                        <goal>clean</goal>
+                    </goals>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>${build.dir}</directory>
+                            </fileset>
+                            <fileset>
+                                <directory>${dist.dir}</directory>
+                            </fileset>
+                            <fileset>
+                                <directory>${reports.dir}</directory>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>init</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <mkdir dir="${build.dir}" />
+                            <mkdir dir="${dist.dir}" />
+                            <mkdir dir="${dist.dir}/libs" />
+                            <mkdir dir="${reports.dir}" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+            <executions>
+                <execution>
+                    <id>compile</id>
+                    <phase>compile</phase>
+                    <goals>
+                        <goal>compile</goal>
+                    </goals>
+                    <configuration>
+                        <source>${src.dir}</source>
+                        <outputDirectory>${build.dir}</outputDirectory>
+                        <includeAntRuntime>false</includeAntRuntime>
+                        <failOnError>false</failOnError>
+                        <compilerArgs>
+                            <arg>-Xlint:unchecked</arg>
+                            <arg>-Xlint:deprecation</arg>
+                        </compilerArgs>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+                <execution>
+                    <id>copy-resources</id>
+                    <phase>process-resources</phase>
+                    <goals>
+                        <goal>resources</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>${build.dir}</outputDirectory>
+                        <resources>
+                            <resource>
+                                <directory>${src.dir}</directory>
+                                <includes>
+                                    <include>**/*</include>
+                                </includes>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+                <execution>
+                    <id>create-jar</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>jar</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>${dist.dir}</outputDirectory>
+                        <finalName>${jar.name}</finalName>
+                        <includes>
+                            <include>**/*</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/*.java</exclude>
+                            <exclude>**/*.form</exclude>
+                        </excludes>
+                        <resources>
+                            <resource>
+                                <directory>${lib.dir}</directory>
+                                <includes>
+                                    <include>*.jar</include>
+                                </includes>
+                            </resource>
+                        </resources>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                                <classpathLayoutType>simple</classpathLayoutType>
+                                <classpathPrefix>libs/</classpathPrefix>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.22.2</version>
+            <executions>
+                <execution>
+                    <id>junit-tests</id>
+                    <phase>test</phase>
+                    <goals>
+                        <goal>test</goal>
+                    </goals>
+                    <configuration>
+                        <forkCount>1</forkCount>
+                        <reuseForks>true</reuseForks>
+                        <testFailureIgnore>false</testFailureIgnore>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                        <reportsDirectory>${reports.dir}</reportsDirectory>
+                        <reportFormat>xml</reportFormat>
+                        <useFile>true</useFile>
+                        <printSummary>true</printSummary>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.3.2</version>
+            <executions>
+                <execution>
+                    <id>generate-javadoc</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>javadoc</goal>
+                    </goals>
+                    <configuration>
+                        <destDir>${reports.dir}/docs</destDir>
+                        <author>true</author>
+                        <version>true</version>
+                        <use>true</use>
+                        <windowTitle>UPS Core API</windowTitle>
+                        <sourcePath>${src.dir}</sourcePath>
+                        <sourceFiles>
+                            <files>
+                                <fileSet>
+                                    <directory>${src.dir}</directory>
+                                    <includes>
+                                        <include>**/*.java</include>
+                                    </includes>
+                                    <useDefaultExcludes>false</useDefaultExcludes>
+                                </fileSet>
+                            </files>
+                        </sourceFiles>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.8</version>
+            <executions>
+                <execution>
+                    <id>build</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                    <configuration>
+                        <tasks>
+                            <echo message="Build completed successfully!" />
+                            <echo message="JAR created: ${dist.dir}/${jar.name}" />
+                            <echo message="Dependencies copied to: ${dist.dir}/libs" />
+                        </tasks>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
