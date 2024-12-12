@@ -1,9 +1,7 @@
 [INFO] Scanning for projects...
 [WARNING] 
 [WARNING] Some problems were encountered while building the effective model for com.ups:ups-main:jar:1.0
-[WARNING] 'dependencies.dependency.systemPath' for com.ups-core:ups-core:jar should not point at files within the project directory, ${project.basedir}/lib/ups-core-${ups.core.version}.jar will be unresolvable by dependent projects @ line 37, column 25
-[WARNING] The expression ${artifactId} is deprecated. Please use ${project.artifactId} instead.
-[WARNING] The expression ${version} is deprecated. Please use ${project.version} instead.
+[WARNING] 'dependencies.dependency.systemPath' for com.ups:ups-core:jar should not point at files within the project directory, ${project.basedir}/lib/ups-core-${ups.core.version}.jar will be unresolvable by dependent projects @ line 82, column 25
 [WARNING] 
 [WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
 [WARNING] 
@@ -15,12 +13,13 @@
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
-[INFO] ----------------[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.095 s
+[INFO] Finished at: 2024-12-12T12:08:36-06:00
+[INFO] ----------------------------------------------------[INFO] Scanning for projects...
 [WARNING] 
 [WARNING] Some problems were encountered while building the effective model for com.ups:ups-main:jar:1.0
-[WARNING] 'dependencies.dependency.systemPath' for com.ups-core:ups-core:jar should not point at files within the project directory, ${project.basedir}/lib/ups-core-${ups.core.version}.jar will be unresolvable by dependent projects @ line 37, column 25
-[WARNING] The expression ${artifactId} is deprecated. Please use ${project.artifactId} instead.
-[WARNING] The expression ${version} is deprecated. Please use ${project.version} instead.
+[WARNING] 'dependencies.dependency.systemPath' for com.ups:ups-core:jar should not point at files within the project directory, ${project.basedir}/lib/ups-core-${ups.core.version}.jar will be unresolvable by dependent projects @ line 82, column 25
 [WARNING] 
 [WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
 [WARNING] 
@@ -33,15 +32,13 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  0.147 s
-[INFO] Finished at: 2024-12-12T12:02:01-06:00
+[INFO] Total time:  0.117 s
+[INFO] Finished at: 2024-12-12T12:08:39-06:00
 [INFO] ------------------------------------------------------------------------
 [INFO] Scanning for projects...
 [WARNING] 
 [WARNING] Some problems were encountered while building the effective model for com.ups:ups-main:jar:1.0
-[WARNING] 'dependencies.dependency.systemPath' for com.ups-core:ups-core:jar should not point at files within the project directory, ${project.basedir}/lib/ups-core-${ups.core.version}.jar will be unresolvable by dependent projects @ line 37, column 25
-[WARNING] The expression ${artifactId} is deprecated. Please use ${project.artifactId} instead.
-[WARNING] The expression ${version} is deprecated. Please use ${project.version} instead.
+[WARNING] 'dependencies.dependency.systemPath' for com.ups:ups-core:jar should not point at files within the project directory, ${project.basedir}/lib/ups-core-${ups.core.version}.jar will be unresolvable by dependent projects @ line 82, column 25
 [WARNING] 
 [WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
 [WARNING] 
@@ -53,9 +50,10 @@
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ ups-main ---
+[INFO] Deleting C:\Users\Shilpitha\Downloads\UPS-POC-Demo\AntMaven\target
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  0.290 s
-[INFO] Finished at: 2024-12-12T12:02:02-06:00
+[INFO] Total time:  0.257 s
+[INFO] Finished at: 2024-12-12T12:08:41-06:00
 [INFO] ------------------------------------------------------------------------
